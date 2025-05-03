@@ -15,6 +15,7 @@ type App struct {
 
 func New(
 	log *slog.Logger,
+	grpcHost string,
 	grpcPort int,
 	storagePath string,
 	tokenTTL time.Duration,
@@ -26,7 +27,7 @@ func New(
 
 	feedService := feed.New(log, storage, tokenTTL)
 
-	grpcApp := grpcapp.New(log, feedService, grpcPort)
+	grpcApp := grpcapp.New(log, feedService, grpcHost, grpcPort)
 
 	return &App{
 		GRPCSrv: grpcApp,

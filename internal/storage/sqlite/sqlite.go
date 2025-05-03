@@ -8,6 +8,7 @@ import (
 
 	"github.com/VariableSan/gia-feed/internal/domain/models"
 	"github.com/VariableSan/gia-feed/internal/storage"
+	"github.com/google/uuid"
 	"github.com/mattn/go-sqlite3"
 )
 
@@ -30,33 +31,29 @@ func (s *Storage) Stop() error {
 	return s.db.Close()
 }
 
-func (s *Storage) SaveFeed(ctx context.Context, title string, content string) (int64, error) {
-	const operation = "storage.sqlite.SaveFeed"
+func (s *Storage) CreateFeed(ctx context.Context, title string, content string) (string, error) {
+	const operation = "storage.sqlite.CreateFeed"
 
-	stmt, err := s.db.Prepare("INSERT INTO feeds(title, content) VALUES(?, ?)")
+	id := uuid.New().String()
+
+	stmt, err := s.db.Prepare("INSERT INTO feeds(id, title, content) VALUES(?, ?, ?)")
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", operation, err)
+		return "", fmt.Errorf("%s: %w", operation, err)
 	}
 
-	res, err := stmt.ExecContext(ctx, title, content)
+	_, err = stmt.ExecContext(ctx, id, title, content)
 	if err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return 0, fmt.Errorf("%s: %w", operation, storage.ErrFeedExists)
+			return "", fmt.Errorf("%s: %w", operation, storage.ErrFeedExists)
 		}
-
-		return 0, fmt.Errorf("%s: %w", operation, err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		return 0, fmt.Errorf("%s: %w", operation, err)
+		return "", fmt.Errorf("%s: %w", operation, err)
 	}
 
 	return id, nil
 }
 
-func (s *Storage) Feed(ctx context.Context, uid int64) (models.Feed, error) {
+func (s *Storage) Feed(ctx context.Context, id string) (models.Feed, error) {
 	const operation = "storage.sqlite.Feed"
 
 	stmt, err := s.db.Prepare("SELECT id, title, content FROM feeds WHERE id = ?")
@@ -64,7 +61,7 @@ func (s *Storage) Feed(ctx context.Context, uid int64) (models.Feed, error) {
 		return models.Feed{}, fmt.Errorf("%s: %w", operation, err)
 	}
 
-	row := stmt.QueryRowContext(ctx, uid)
+	row := stmt.QueryRowContext(ctx, id)
 
 	var feed models.Feed
 	err = row.Scan(&feed.ID, &feed.Content, &feed.Title)

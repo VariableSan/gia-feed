@@ -15,12 +15,12 @@ type Feed struct {
 }
 
 type FeedProvider interface {
-	Feed(ctx context.Context, uid int64) (models.Feed, error)
-	SaveFeed(
+	Feed(ctx context.Context, id string) (models.Feed, error)
+	CreateFeed(
 		ctx context.Context,
 		title string,
 		content string,
-	) (int64, error)
+	) (string, error)
 }
 
 func New(
@@ -34,21 +34,21 @@ func New(
 	}
 }
 
-func (feed *Feed) SaveFeed(
+func (feed *Feed) CreateFeed(
 	ctx context.Context,
 	title string,
 	content string,
-) (int64, error) {
-	const operation = "feed.SaveFeed"
+) (string, error) {
+	const operation = "feed.CreateFeed"
 
 	log := feed.log.With(
 		slog.String("operation", operation),
 	)
 
-	id, err := feed.feedProvider.SaveFeed(ctx, title, content)
+	id, err := feed.feedProvider.CreateFeed(ctx, title, content)
 	if err != nil {
 		log.Error("failed to save feed")
-		return 0, fmt.Errorf("%s: %w", operation, err)
+		return "", fmt.Errorf("%s: %w", operation, err)
 	}
 
 	log.Info("feed saved")

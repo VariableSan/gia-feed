@@ -11,23 +11,23 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type Feed interface {
-	SaveFeed(
+type FeedService interface {
+	CreateFeed(
 		ctx context.Context,
 		title string,
 		content string,
-	) (int64, error)
+	) (string, error)
 }
 
 type serverAPI struct {
 	feedv1.UnimplementedFeedServiceServer
-	feed Feed
+	feedService FeedService
 }
 
-func Register(gRPC *grpc.Server, feed Feed) {
+func Register(gRPC *grpc.Server, feedService FeedService) {
 	feedv1.RegisterFeedServiceServer(
 		gRPC,
-		&serverAPI{feed: feed},
+		&serverAPI{feedService: feedService},
 	)
 }
 
@@ -39,11 +39,13 @@ func (s *serverAPI) CreateFeed(
 		return nil, err
 	}
 
-	_, err := s.feed.SaveFeed(ctx, req.GetTitle(), req.GetContent())
+	id, err := s.feedService.CreateFeed(ctx, req.GetTitle(), req.GetContent())
 	if err != nil {
 		fmt.Println(err)
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &feedv1.CreateFeedResponse{}, nil
+	return &feedv1.CreateFeedResponse{
+		Id: id,
+	}, nil
 }
