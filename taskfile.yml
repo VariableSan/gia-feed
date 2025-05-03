@@ -1,0 +1,18 @@
+version: "3.8"
+
+tasks:
+  help:
+    desc: Display help for each task
+    cmds:
+      - task --list
+
+  run:
+    desc: run for API v1
+    cmds:
+      - go mod download
+      - CGO_ENABLED=1 go run ./cmd/feed --config="./config/local.yaml"
+
+  migrate:
+    desc: Run database migrations
+    cmds:
+      - go run ./cmd/migrator --storage-path=./storage/feed.db --migrations-path=./migrations
