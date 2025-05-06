@@ -31,17 +31,17 @@ func (s *Storage) Stop() error {
 	return s.db.Close()
 }
 
-func (s *Storage) CreateFeed(ctx context.Context, title string, content string) (string, error) {
+func (s *Storage) CreateFeed(ctx context.Context, title string, content string, userID string) (string, error) {
 	const operation = "storage.sqlite.CreateFeed"
 
 	id := uuid.New().String()
 
-	stmt, err := s.db.Prepare("INSERT INTO feeds(id, title, content) VALUES(?, ?, ?)")
+	stmt, err := s.db.Prepare("INSERT INTO feeds(id, title, content, author_id) VALUES(?, ?, ?, ?)")
 	if err != nil {
 		return "", fmt.Errorf("%s: %w", operation, err)
 	}
 
-	_, err = stmt.ExecContext(ctx, id, title, content)
+	_, err = stmt.ExecContext(ctx, id, title, content, userID)
 	if err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {

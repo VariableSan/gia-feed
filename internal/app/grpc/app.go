@@ -6,6 +6,7 @@ import (
 	"net"
 
 	feedgrpc "github.com/VariableSan/gia-feed/internal/grpc/feed"
+	"github.com/VariableSan/gia-feed/internal/grpc/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -23,7 +24,9 @@ func New(
 	host string,
 	port int,
 ) *App {
-	gRPCServer := grpc.NewServer()
+	gRPCServer := grpc.NewServer(
+		grpc.UnaryInterceptor(middleware.AuthInterceptor([]byte("gia-secret"))),
+	)
 
 	feedgrpc.Register(gRPCServer, feedService)
 	reflection.Register(gRPCServer)

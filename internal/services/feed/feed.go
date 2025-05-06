@@ -20,6 +20,7 @@ type FeedProvider interface {
 		ctx context.Context,
 		title string,
 		content string,
+		userID string,
 	) (string, error)
 }
 
@@ -38,6 +39,7 @@ func (feed *Feed) CreateFeed(
 	ctx context.Context,
 	title string,
 	content string,
+	userID string,
 ) (string, error) {
 	const operation = "feed.CreateFeed"
 
@@ -45,7 +47,7 @@ func (feed *Feed) CreateFeed(
 		slog.String("operation", operation),
 	)
 
-	id, err := feed.feedProvider.CreateFeed(ctx, title, content)
+	id, err := feed.feedProvider.CreateFeed(ctx, title, content, userID)
 	if err != nil {
 		log.Error("failed to save feed")
 		return "", fmt.Errorf("%s: %w", operation, err)
