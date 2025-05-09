@@ -29,9 +29,19 @@ type CreateFeedRequestValidator struct {
 	Content string `validate:"required"`
 }
 
+type GetFeedRequestValidator struct {
+	ID string `validate:"required"`
+}
+
 func ValidateCreateFeedRequest(req *feedv1.CreateFeedRequest) error {
 	return Validate(CreateFeedRequestValidator{
 		Title:   req.GetTitle(),
 		Content: req.GetContent(),
+	})
+}
+
+func ValidateGetFeedRequest(req *feedv1.GetFeedRequest) error {
+	return Validate(GetFeedRequestValidator{
+		ID: req.GetId(),
 	})
 }

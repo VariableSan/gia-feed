@@ -53,12 +53,12 @@ func (s *Storage) CreateFeed(ctx context.Context, title string, content string, 
 	return id, nil
 }
 
-func (s *Storage) Feed(ctx context.Context, id string) (models.Feed, error) {
+func (s *Storage) GetFeed(ctx context.Context, id string) (*models.Feed, error) {
 	const operation = "storage.sqlite.Feed"
 
 	stmt, err := s.db.Prepare("SELECT id, title, content FROM feeds WHERE id = ?")
 	if err != nil {
-		return models.Feed{}, fmt.Errorf("%s: %w", operation, err)
+		return nil, fmt.Errorf("%s: %w", operation, err)
 	}
 
 	row := stmt.QueryRowContext(ctx, id)
@@ -67,11 +67,11 @@ func (s *Storage) Feed(ctx context.Context, id string) (models.Feed, error) {
 	err = row.Scan(&feed.ID, &feed.Content, &feed.Title)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Feed{}, fmt.Errorf("%s: %w", operation, storage.ErrFeedNotFound)
+			return nil, fmt.Errorf("%s: %w", operation, storage.ErrFeedNotFound)
 		}
 
-		return models.Feed{}, fmt.Errorf("%s: %w", operation, err)
+		return nil, fmt.Errorf("%s: %w", operation, err)
 	}
 
-	return feed, nil
+	return &feed, nil
 }

@@ -14,7 +14,7 @@ type Feed struct {
 }
 
 type FeedProvider interface {
-	Feed(ctx context.Context, id string) (models.Feed, error)
+	GetFeed(ctx context.Context, id string) (*models.Feed, error)
 	CreateFeed(
 		ctx context.Context,
 		title string,
@@ -31,6 +31,27 @@ func New(
 		log:          log,
 		feedProvider: provider,
 	}
+}
+
+func (feed *Feed) GetFeed(
+	ctx context.Context,
+	id string,
+) (*models.Feed, error) {
+	const operation = "feed.GetFeed"
+
+	log := feed.log.With(
+		slog.String("operation", operation),
+	)
+
+	result, err := feed.feedProvider.GetFeed(ctx, id)
+	if err != nil {
+		log.Error("failed to get feed")
+		return nil, fmt.Errorf("%s: %w", operation, err)
+	}
+
+	log.Info("feed sent")
+
+	return result, nil
 }
 
 func (feed *Feed) CreateFeed(
