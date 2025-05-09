@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/VariableSan/gia-feed/internal/domain/models"
 )
@@ -20,14 +19,13 @@ type FeedProvider interface {
 		ctx context.Context,
 		title string,
 		content string,
-		userID string,
+		authorID string,
 	) (string, error)
 }
 
 func New(
 	log *slog.Logger,
 	provider FeedProvider,
-	tokenTTL time.Duration,
 ) *Feed {
 	return &Feed{
 		log:          log,
@@ -39,7 +37,7 @@ func (feed *Feed) CreateFeed(
 	ctx context.Context,
 	title string,
 	content string,
-	userID string,
+	authorID string,
 ) (string, error) {
 	const operation = "feed.CreateFeed"
 
@@ -47,7 +45,7 @@ func (feed *Feed) CreateFeed(
 		slog.String("operation", operation),
 	)
 
-	id, err := feed.feedProvider.CreateFeed(ctx, title, content, userID)
+	id, err := feed.feedProvider.CreateFeed(ctx, title, content, authorID)
 	if err != nil {
 		log.Error("failed to save feed")
 		return "", fmt.Errorf("%s: %w", operation, err)

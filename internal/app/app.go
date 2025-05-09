@@ -2,7 +2,6 @@ package app
 
 import (
 	"log/slog"
-	"time"
 
 	grpcapp "github.com/VariableSan/gia-feed/internal/app/grpc"
 	"github.com/VariableSan/gia-feed/internal/services/feed"
@@ -18,16 +17,16 @@ func New(
 	grpcHost string,
 	grpcPort int,
 	storagePath string,
-	tokenTTL time.Duration,
+	jwtSecret string,
 ) *App {
 	storage, err := sqlite.New(storagePath)
 	if err != nil {
 		panic(err)
 	}
 
-	feedService := feed.New(log, storage, tokenTTL)
+	feedService := feed.New(log, storage)
 
-	grpcApp := grpcapp.New(log, feedService, grpcHost, grpcPort)
+	grpcApp, err := grpcapp.New(log, feedService, grpcHost, grpcPort, jwtSecret)
 
 	return &App{
 		GRPCSrv: grpcApp,

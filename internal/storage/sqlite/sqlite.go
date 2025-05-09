@@ -31,7 +31,7 @@ func (s *Storage) Stop() error {
 	return s.db.Close()
 }
 
-func (s *Storage) CreateFeed(ctx context.Context, title string, content string, userID string) (string, error) {
+func (s *Storage) CreateFeed(ctx context.Context, title string, content string, authorID string) (string, error) {
 	const operation = "storage.sqlite.CreateFeed"
 
 	id := uuid.New().String()
@@ -41,7 +41,7 @@ func (s *Storage) CreateFeed(ctx context.Context, title string, content string, 
 		return "", fmt.Errorf("%s: %w", operation, err)
 	}
 
-	_, err = stmt.ExecContext(ctx, id, title, content, userID)
+	_, err = stmt.ExecContext(ctx, id, title, content, authorID)
 	if err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {

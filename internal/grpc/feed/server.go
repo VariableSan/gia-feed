@@ -17,7 +17,7 @@ type FeedService interface {
 		ctx context.Context,
 		title string,
 		content string,
-		userID string,
+		authorID string,
 	) (string, error)
 }
 

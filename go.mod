@@ -3,14 +3,14 @@ module github.com/VariableSan/gia-feed
 go 1.24.2
 
 require (
-	github.com/VariableSan/gia-protos v1.0.2
+	github.com/VariableSan/gia-protos v1.0.3
 	github.com/go-playground/validator/v10 v10.26.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/golang-migrate/migrate/v4 v4.18.3
 	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/mattn/go-sqlite3 v1.14.28
 	google.golang.org/grpc v1.72.0
-	github.com/golang-jwt/jwt/v5 v5.2.2
 )
 
 require (

@@ -26,7 +26,7 @@ func main() {
 		cfg.GRPC.Host,
 		cfg.GRPC.Port,
 		cfg.StoragePath,
-		cfg.TokenTTL,
+		cfg.JWTSecret,
 	)
 
 	go application.GRPCSrv.MustRun()

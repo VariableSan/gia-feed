@@ -16,6 +16,7 @@ type App struct {
 	gRPCServer *grpc.Server
 	host       string
 	port       int
+	jwtSecret  string
 }
 
 func New(
@@ -23,9 +24,10 @@ func New(
 	feedService feedgrpc.FeedService,
 	host string,
 	port int,
-) *App {
+	jwtSecret string,
+) (*App, error) {
 	gRPCServer := grpc.NewServer(
-		grpc.UnaryInterceptor(middleware.AuthInterceptor([]byte("gia-secret"))),
+		grpc.UnaryInterceptor(middleware.AuthInterceptor([]byte(jwtSecret))),
 	)
 
 	feedgrpc.Register(gRPCServer, feedService)
@@ -36,7 +38,7 @@ func New(
 		gRPCServer: gRPCServer,
 		host:       host,
 		port:       port,
-	}
+	}, nil
 }
 
 func (app *App) MustRun() {
